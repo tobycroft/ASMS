@@ -2,6 +2,7 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"main.go/app/asms/action"
 	"main.go/app/asms/model/ProjectModel"
 	"main.go/config/app_conf"
 	"main.go/tuuz/Calc"
@@ -65,10 +66,22 @@ func IndexController(route *gin.RouterGroup) {
 func send(c *gin.Context) {
 	name := c.PostForm("name")
 	data := ProjectModel.Api_find(name)
+	phone, ok := Input.Post("phone", c, false)
+	if !ok {
+		return
+	}
+	quhao, ok := Input.Post("quhao", c, false)
+	if !ok {
+		return
+	}
+	text, ok := Input.Post("text", c, false)
+	if !ok {
+		return
+	}
 	if len(data) > 0 {
 		switch data["type"].(string) {
 		case "tencent":
-
+			action.App_tencent(data["id"], phone, quhao, text)
 			break
 
 		default:
