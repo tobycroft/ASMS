@@ -7,12 +7,11 @@ import (
 
 const table = "log_error"
 
-func Api_insert(name, error, date interface{}) bool {
+func Api_insert(pid, error interface{}) bool {
 	db := tuuz.Db().Table(table)
 	data := map[string]interface{}{
-		"name":  name,
+		"pid":   pid,
 		"error": error,
-		"date":  date,
 	}
 	db.Data(data)
 	_, err := db.Insert()

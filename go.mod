@@ -3,7 +3,7 @@ module main.go
 go 1.14
 
 require (
-	github.com/Unknwon/goconfig v0.0.0-20200908083735-df7de6a44db8 // indirect
+	github.com/Unknwon/goconfig v0.0.0-20200908083735-df7de6a44db8
 	github.com/afocus/captcha v0.0.0-20191010092841-4bd1f21c8868
 	github.com/bitly/go-simplejson v0.5.1-0.20200416141419-39a59b1b2866
 	github.com/gin-contrib/cors v1.3.2-0.20200402113712-0223cb87b2c4
@@ -21,7 +21,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/shopspring/decimal v1.2.0
-	github.com/sunnyos/tencentSms v0.0.0-20200826122839-fe5347404636 // indirect
+	github.com/sunnyos/tencentSms v0.0.0-20200826122839-fe5347404636
 	github.com/ugorji/go v1.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9 // indirect
 	golang.org/x/image v0.0.0-20201208152932-35266b937fa6 // indirect
