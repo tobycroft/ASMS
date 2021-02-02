@@ -22,7 +22,7 @@ func App_tencent(id interface{}, phone, quhao, text string) error {
 			Sign:   Calc.Any2String(tencent["sign"]),
 		}
 		s := sms.NewSms(config)
-		res, err := s.GetSmsSender().Fetchs(phone, quhao, []string{text}, tencent["861810"].(int64))
+		res, err := s.GetSmsSender().Fetchs(phone, quhao, []string{text}, tencent["tplid"].(int64))
 		if err != nil {
 			Log.Crrs(err, tuuz.FUNCTION_ALL())
 			return err
