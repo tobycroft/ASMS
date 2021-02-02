@@ -144,6 +144,8 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
+github.com/sunnyos/tencentSms v0.0.0-20200826122839-fe5347404636 h1:1jU1QEntQBy1wOAA6AICsc4zZgFHEDLtLfKbRcnUFdg=
+github.com/sunnyos/tencentSms v0.0.0-20200826122839-fe5347404636/go.mod h1:Z+ON+YaJfqrxFRhZDUcXRrTsXf+jUSnEf9v2UTL4ADg=
 github.com/ugorji/go v1.1.7 h1:/68gy2h+1mWMrwZFeD1kQialdSzAb432dtpeJ42ovdo=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=
 github.com/ugorji/go v1.1.9 h1:SObrQTaSuP8WOv2WNCj8gECiNSJIUvk3Q7N26c96Gws=

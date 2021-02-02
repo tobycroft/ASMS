@@ -21,6 +21,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/shopspring/decimal v1.2.0
+	github.com/sunnyos/tencentSms v0.0.0-20200826122839-fe5347404636 // indirect
 	github.com/ugorji/go v1.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20201208171446-5f87f3452ae9 // indirect
 	golang.org/x/image v0.0.0-20201208152932-35266b937fa6 // indirect
