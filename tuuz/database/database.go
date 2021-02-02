@@ -48,10 +48,10 @@ func dsn_local() string {
 }
 
 func dsn() string {
-	dbname := "1"
-	dbuser := "1"
-	dbpass := "1"
-	dbhost := "1"
+	dbname := "ASMS"
+	dbuser := "asms"
+	dbpass := "asms"
+	dbhost := "10.0.0.170"
 	conntype := "tcp"
 	dbport := "3306"
 	charset := "utf8mb4"
