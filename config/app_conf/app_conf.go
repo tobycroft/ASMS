@@ -2,4 +2,4 @@ package app_conf
 
 const Project = "ASMS"
 
-const Debug = true
+const Debug = false
