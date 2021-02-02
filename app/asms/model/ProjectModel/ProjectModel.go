@@ -23,10 +23,10 @@ func Api_find(token interface{}) gorose.Data {
 	}
 }
 
-func Api_dec_amount(pid interface{}) bool {
+func Api_dec_amount(id interface{}) bool {
 	db := tuuz.Db().Table(table)
 	where := map[string]interface{}{
-		"pid": pid,
+		"id": id,
 	}
 	db.Where(where)
 	_, err := db.Increment("amount", 1)
