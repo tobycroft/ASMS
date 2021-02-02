@@ -12,12 +12,9 @@ import (
 )
 
 func IndexController(route *gin.RouterGroup) {
-	route.Any("/", func(context *gin.Context) {
-		context.String(0, route.BasePath())
-	})
 
 	route.Use(func(c *gin.Context) {
-		ts, ok := Input.PostInt64("ts,", c)
+		ts, ok := Input.PostInt64("ts", c)
 		if !ok {
 			return
 		}
