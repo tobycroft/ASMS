@@ -2,8 +2,6 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	config2 "github.com/sunnyos/tencentSms/config"
-	"github.com/sunnyos/tencentSms/sms"
 	"main.go/app/asms/model/ProjectModel"
 	"main.go/config/app_conf"
 	"main.go/tuuz/Calc"
@@ -68,16 +66,15 @@ func send(c *gin.Context) {
 	name := c.PostForm("name")
 	data := ProjectModel.Api_find(name)
 	if len(data) > 0 {
-		config := &config2.Config{
-			AppId:  "1400482871",
-			AppKey: "7f293893d05e8e4e38edf05d6d885ff0",
-			Sign:   "易聊红包APP",
+		switch data["type"].(string) {
+		case "tencent":
+
+			break
+
+		default:
+			break
 		}
-		s := sms.NewSms(config)
-		tel := sms.SmsTel{Mobile: "13107670001", Nationcode: "86"}
-		p := &sms.Params{Params: []string{"1234"}, Tel: tel, TplId: 861810}
-		res, err := s.GetSmsSender().Fetch(p)
-		println(res, err)
+
 	} else {
 
 	}
