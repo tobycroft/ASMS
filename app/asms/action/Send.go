@@ -5,13 +5,15 @@ import (
 	config2 "github.com/sunnyos/tencentSms/config"
 	"github.com/sunnyos/tencentSms/sms"
 	"main.go/app/asms/model/LogErrorModel"
+	"main.go/app/asms/model/LogSuccessModel"
+	"main.go/app/asms/model/ProjectModel"
 	"main.go/app/asms/model/TencentModel"
 	"main.go/tuuz"
 	"main.go/tuuz/Calc"
 	"main.go/tuuz/Log"
 )
 
-func App_tencent(id interface{}, phone, quhao, code string) {
+func App_tencent(id interface{}, phone, quhao, text string) {
 	tencent := TencentModel.Api_find(id)
 	if len(tencent) > 0 {
 		config := &config2.Config{
@@ -20,12 +22,13 @@ func App_tencent(id interface{}, phone, quhao, code string) {
 			Sign:   Calc.Any2String(tencent["sign"]),
 		}
 		s := sms.NewSms(config)
-		res, err := s.GetSmsSender().Fetchs(phone, quhao, []string{code}, tencent["861810"].(int64))
+		res, err := s.GetSmsSender().Fetchs(phone, quhao, []string{text}, tencent["861810"].(int64))
 		if err != nil {
 			Log.Crrs(err, tuuz.FUNCTION_ALL())
 		}
 		if res.Result == 0 {
-
+			ProjectModel.Api_dec_amount(tencent["pid"])
+			LogSuccessModel.Api_insert(tencent["pid"], text)
 		} else {
 			LogErrorModel.Api_insert(tencent["pid"], res.Errmsg)
 		}
