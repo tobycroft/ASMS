@@ -29,7 +29,7 @@ func Api_dec_amount(id interface{}) bool {
 		"id": id,
 	}
 	db.Where(where)
-	_, err := db.Increment("amount", 1)
+	_, err := db.Decrement("amount", 1)
 	if err != nil {
 		Log.Dbrr(err, tuuz.FUNCTION_ALL())
 		return false
