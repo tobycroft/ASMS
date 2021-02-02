@@ -16,6 +16,9 @@ import (
 func App_tencent(id interface{}, phone, quhao, text string) error {
 	tencent := TencentModel.Api_find(id)
 	if len(tencent) > 0 {
+		if tencent["amount"].(int64) < 1 {
+			return errors.New("短信余额不足，请充值")
+		}
 		config := &config2.Config{
 			AppId:  Calc.Any2String(tencent["appid"]),
 			AppKey: Calc.Any2String(tencent["appkey"]),
