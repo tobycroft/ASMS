@@ -78,9 +78,17 @@ func send(c *gin.Context) {
 	if !ok {
 		return
 	}
+	if data["amount"].(int64) < 1 {
+		RET.Fail(c, 400, "没有数量了", "没有可以用于扣除的数量了")
+		return
+	}
 	if len(data) > 0 {
 		switch data["type"].(string) {
 		case "tencent":
+			if !ProjectModel.Api_dec_amount(data["id"]) {
+				RET.Fail(c, 400, "没有数量了", "没有可以用于扣除的数量了")
+				return
+			}
 			err := action.App_tencent(data["id"], phone, quhao, text)
 			if err != nil {
 				RET.Fail(c, 300, err, err.Error())
