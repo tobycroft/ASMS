@@ -2,7 +2,6 @@ package action
 
 import (
 	"errors"
-	"fmt"
 	config2 "github.com/sunnyos/tencentSms/config"
 	"github.com/sunnyos/tencentSms/sms"
 	"main.go/app/asms/model/LogErrorModel"
@@ -46,23 +45,30 @@ func App_tencent(id interface{}, phone, quhao, text string) error {
 	}
 }
 
-func Aoo_253(id interface{}, phone, quhao, text string) error {
+func App_253(id interface{}, phone, quhao, text string) error {
 	zz := Zz253Model.Api_find(id)
 	if len(zz) > 0 {
 
+		sms := sms253.NewSms253(Calc.Any2String(zz["appcode"]), Calc.Any2String(zz["appsecret"]))
+
+		res, err := sms.SendSms(text, phone)
+		if err != nil {
+			Log.Crrs(err, tuuz.FUNCTION_ALL())
+			return err
+		}
+		if res.Code == "0" {
+			if !ProjectModel.Api_dec_amount(zz["pid"]) {
+				return errors.New("ProjectModelApi_dec_amount")
+			}
+			LogSuccessModel.Api_insert(zz["pid"], text)
+			return nil
+		} else {
+			LogErrorModel.Api_insert(zz["pid"], res.ErrorMsg)
+			return errors.New(res.ErrorMsg)
+		}
 	} else {
 		return errors.New("未找到项目")
 
 	}
 
-	sms := sms253.NewSms253("N00xxxxxx", "eLENxxxxxx")
-
-	msg := "【253云通讯】" + "测试人员您的验ddd证码为888888请在5分钟内输入。"
-
-	rl, err := sms.SendSms(msg, "13600xxxxx")
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(rl)
 }
