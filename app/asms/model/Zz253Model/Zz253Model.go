@@ -11,7 +11,7 @@ const table = "zz253"
 func Api_find(id interface{}) gorose.Data {
 	db := tuuz.Db().Table(table)
 	where := map[string]interface{}{
-		"id": id,
+		"pid": id,
 	}
 	db.Where(where)
 	ret, err := db.First()
