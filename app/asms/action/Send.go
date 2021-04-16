@@ -2,12 +2,14 @@ package action
 
 import (
 	"errors"
+	"fmt"
 	config2 "github.com/sunnyos/tencentSms/config"
 	"github.com/sunnyos/tencentSms/sms"
 	"main.go/app/asms/model/LogErrorModel"
 	"main.go/app/asms/model/LogSuccessModel"
 	"main.go/app/asms/model/ProjectModel"
 	"main.go/app/asms/model/TencentModel"
+	"main.go/extends/sms253"
 	"main.go/tuuz"
 	"main.go/tuuz/Calc"
 	"main.go/tuuz/Log"
@@ -41,4 +43,17 @@ func App_tencent(id interface{}, phone, quhao, text string) error {
 	} else {
 		return errors.New("未找到项目")
 	}
+}
+
+func Aoo_253(id interface{}, phone, quhao, text string) error {
+	sms := sms253.NewSms253("N00xxxxxx", "eLENxxxxxx")
+
+	msg := "【253云通讯】" + "测试人员您的验ddd证码为888888请在5分钟内输入。"
+
+	rl, err := sms.SendSms(msg, "13600xxxxx")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(rl)
 }
