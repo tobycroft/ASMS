@@ -110,6 +110,19 @@ func send(c *gin.Context) {
 			}
 			break
 
+		case "ihuyi":
+			if !ProjectModel.Api_dec_amount(data["id"]) {
+				RET.Fail(c, 400, "没有数量了", "没有可以用于扣除的数量了")
+				return
+			}
+			err := action.App_ihuyi(data["id"], phone, quhao, text)
+			if err != nil {
+				RET.Fail(c, 300, err, err.Error())
+			} else {
+				RET.Success(c, 0, err, nil)
+			}
+			break
+
 		default:
 			RET.Fail(c, 404, nil, "没有执行方法")
 			break
