@@ -18,7 +18,7 @@ func GetMd5String(s string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func Ihuyi_send(APIID, APIKEY, phone, content string) error {
+func Ihuyi_send(APIID, APIKEY, phone, content string) (string, error) {
 	v := url.Values{}
 	_now := strconv.FormatInt(time.Now().Unix(), 10)
 	//fmt.Printf(_now)
@@ -41,11 +41,10 @@ func Ihuyi_send(APIID, APIKEY, phone, content string) error {
 	resp, err := client.Do(req) //发送
 	defer resp.Body.Close()     //一定要关闭resp.Body
 	data, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(data), err)
-	return nil
+	return string(data), err
 }
 
-func Ihuyi_send_intl(APIID, APIKEY, phone, content string) error {
+func Ihuyi_send_intl(APIID, APIKEY, phone, content string) (string, error) {
 	v := url.Values{}
 	_now := strconv.FormatInt(time.Now().Unix(), 10)
 	//fmt.Printf(_now)
@@ -69,5 +68,5 @@ func Ihuyi_send_intl(APIID, APIKEY, phone, content string) error {
 	defer resp.Body.Close()     //一定要关闭resp.Body
 	data, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println(string(data), err)
-	return nil
+	return string(data), err
 }
