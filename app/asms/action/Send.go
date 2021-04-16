@@ -9,6 +9,7 @@ import (
 	"main.go/app/asms/model/LogSuccessModel"
 	"main.go/app/asms/model/ProjectModel"
 	"main.go/app/asms/model/TencentModel"
+	"main.go/app/asms/model/Zz253Model"
 	"main.go/extends/sms253"
 	"main.go/tuuz"
 	"main.go/tuuz/Calc"
@@ -46,6 +47,14 @@ func App_tencent(id interface{}, phone, quhao, text string) error {
 }
 
 func Aoo_253(id interface{}, phone, quhao, text string) error {
+	zz := Zz253Model.Api_find(id)
+	if len(zz) > 0 {
+
+	} else {
+		return errors.New("未找到项目")
+
+	}
+
 	sms := sms253.NewSms253("N00xxxxxx", "eLENxxxxxx")
 
 	msg := "【253云通讯】" + "测试人员您的验ddd证码为888888请在5分钟内输入。"
