@@ -8,6 +8,7 @@ import (
 	"main.go/tuuz/Calc"
 	"main.go/tuuz/Input"
 	"main.go/tuuz/RET"
+	"main.go/tuuz/Vali"
 )
 
 func IndexController(route *gin.RouterGroup) {
@@ -74,6 +75,8 @@ func send(c *gin.Context) {
 	if !ok {
 		return
 	}
+	ok, str := Vali.Length(quhao, 1, 3)
+
 	text, ok := Input.Post("text", c, false)
 	if !ok {
 		return
@@ -115,11 +118,12 @@ func send(c *gin.Context) {
 				RET.Fail(c, 400, "没有数量了", "没有可以用于扣除的数量了")
 				return
 			}
-			err := action.App_ihuyi(data["id"], phone, quhao, text)
+
+			str, err := action.App_ihuyi(data["id"], phone, quhao, text)
 			if err != nil {
-				RET.Fail(c, 300, err, err.Error())
+				RET.Fail(c, 300, err.Error(), err.Error())
 			} else {
-				RET.Success(c, 0, err, nil)
+				RET.Success(c, 0, err, str)
 			}
 			break
 

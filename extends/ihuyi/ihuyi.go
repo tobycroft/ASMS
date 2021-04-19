@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
+	"main.go/tuuz/Jsong"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -31,6 +32,7 @@ func Ihuyi_send(APIID, APIKEY, phone, content string) (string, error) {
 	v.Set("mobile", _mobile)
 	v.Set("content", _content)
 	v.Set("time", _now)
+	v.Set("format", "json")
 	body := strings.NewReader(v.Encode()) //把form数据编下码
 	client := &http.Client{}
 	req, _ := http.NewRequest("POST", "http://106.ihuyi.com/webservice/sms.php?method=Submit&format=json", body)
@@ -41,10 +43,13 @@ func Ihuyi_send(APIID, APIKEY, phone, content string) (string, error) {
 	resp, err := client.Do(req) //发送
 	defer resp.Body.Close()     //一定要关闭resp.Body
 	data, _ := ioutil.ReadAll(resp.Body)
+	jobject, err := Jsong.JObject(string(data))
+	fmt.Println(jobject, err)
+
 	return string(data), err
 }
 
-func Ihuyi_send_intl(APIID, APIKEY, phone, content string) (string, error) {
+func Ihuyi_send_intl(APIID, APIKEY, quhao, phone, content string) (string, error) {
 	v := url.Values{}
 	_now := strconv.FormatInt(time.Now().Unix(), 10)
 	//fmt.Printf(_now)
@@ -57,6 +62,7 @@ func Ihuyi_send_intl(APIID, APIKEY, phone, content string) (string, error) {
 	v.Set("mobile", _mobile)
 	v.Set("content", _content)
 	v.Set("time", _now)
+	v.Set("format", "json")
 	body := strings.NewReader(v.Encode()) //把form数据编下码
 	client := &http.Client{}
 	req, _ := http.NewRequest("POST", "http://api.isms.ihuyi.com/webservice/isms.php?method=Submit&format=json", body)

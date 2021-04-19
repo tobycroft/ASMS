@@ -75,7 +75,7 @@ func App_253(id interface{}, phone, quhao, text string) error {
 	}
 }
 
-func App_ihuyi(id interface{}, phone, quhao, text string) error {
+func App_ihuyi(id interface{}, phone, quhao, text string) (string, error) {
 	ihuyi := IhuyiModel.Api_find(id)
 	if len(ihuyi) > 0 {
 		apiid := Calc.Any2String(ihuyi["apiid"])
@@ -84,21 +84,20 @@ func App_ihuyi(id interface{}, phone, quhao, text string) error {
 		if quhao == "86" {
 			str, _ = ihuyi2.Ihuyi_send(apiid, apikey, phone, text)
 		} else {
-			str, _ = ihuyi2.Ihuyi_send_intl(apiid, apikey, phone, text)
+			str, _ = ihuyi2.Ihuyi_send_intl(apiid, apikey, quhao, phone, text)
 		}
 		fmt.Println(str)
 		if true {
 			if !ProjectModel.Api_dec_amount(ihuyi["pid"]) {
-				return errors.New("ProjectModelApi_dec_amount")
+				return "", errors.New("ProjectModelApi_dec_amount")
 			}
 			LogSuccessModel.Api_insert(ihuyi["pid"], text)
-			return nil
+			return str, nil
 		} else {
 			LogErrorModel.Api_insert(ihuyi["pid"], str)
-			return errors.New(str)
+			return str, errors.New(str)
 		}
 	} else {
-		return errors.New("未找到项目")
-
+		return "", errors.New("未找到项目")
 	}
 }
