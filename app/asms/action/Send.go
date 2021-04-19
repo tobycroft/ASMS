@@ -2,6 +2,7 @@ package action
 
 import (
 	"errors"
+	"fmt"
 	config2 "github.com/sunnyos/tencentSms/config"
 	"github.com/sunnyos/tencentSms/sms"
 	"main.go/app/asms/model/IhuyiModel"
@@ -85,7 +86,7 @@ func App_ihuyi(id interface{}, phone, quhao, text string) error {
 		} else {
 			str, _ = ihuyi2.Ihuyi_send_intl(apiid, apikey, phone, text)
 		}
-
+		fmt.Println(str)
 		if true {
 			if !ProjectModel.Api_dec_amount(ihuyi["pid"]) {
 				return errors.New("ProjectModelApi_dec_amount")
