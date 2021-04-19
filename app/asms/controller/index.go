@@ -71,12 +71,20 @@ func send(c *gin.Context) {
 	if !ok {
 		return
 	}
+	err := Vali.Length(phone, 8, 11)
+	if err != nil {
+		RET.Fail(c, 400, nil, err.Error())
+		return
+	}
 	quhao, ok := Input.Post("quhao", c, false)
 	if !ok {
 		return
 	}
-	ok, str := Vali.Length(quhao, 1, 3)
-
+	err = Vali.Length(quhao, 1, 3)
+	if err != nil {
+		RET.Fail(c, 400, nil, err.Error())
+		return
+	}
 	text, ok := Input.Post("text", c, false)
 	if !ok {
 		return
