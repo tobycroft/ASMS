@@ -2,7 +2,6 @@ package action
 
 import (
 	"errors"
-	"fmt"
 	config2 "github.com/sunnyos/tencentSms/config"
 	"github.com/sunnyos/tencentSms/sms"
 	"main.go/app/asms/model/IhuyiModel"
@@ -15,6 +14,7 @@ import (
 	"main.go/extends/sms253"
 	"main.go/tuuz"
 	"main.go/tuuz/Calc"
+	"main.go/tuuz/Jsong"
 	"main.go/tuuz/Log"
 )
 
@@ -86,16 +86,21 @@ func App_ihuyi(id interface{}, phone, quhao, text string) (string, error) {
 		} else {
 			str, _ = ihuyi2.Ihuyi_send_intl(apiid, apikey, quhao, phone, text)
 		}
-		fmt.Println(str)
-		if true {
-			if !ProjectModel.Api_dec_amount(ihuyi["pid"]) {
-				return "", errors.New("ProjectModelApi_dec_amount")
-			}
-			LogSuccessModel.Api_insert(ihuyi["pid"], text)
-			return str, nil
-		} else {
+		json, err := Jsong.JObject(str)
+		if err != nil {
 			LogErrorModel.Api_insert(ihuyi["pid"], str)
-			return str, errors.New(str)
+			return str, err
+		} else {
+			if Calc.Any2String(json["code"]) == "2" {
+				if !ProjectModel.Api_dec_amount(ihuyi["pid"]) {
+					return Calc.Any2String(json["msg"]), errors.New("ProjectModelApi_dec_amount")
+				}
+				LogSuccessModel.Api_insert(ihuyi["pid"], text)
+				return Calc.Any2String(json["msg"]), nil
+			} else {
+				LogErrorModel.Api_insert(ihuyi["pid"], str)
+				return Calc.Any2String(json["msg"]), errors.New(str)
+			}
 		}
 	} else {
 		return "", errors.New("未找到项目")
