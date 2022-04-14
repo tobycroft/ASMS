@@ -126,12 +126,24 @@ func send(c *gin.Context) {
 				RET.Fail(c, 400, "没有数量了", "没有可以用于扣除的数量了")
 				return
 			}
-
 			str, err := action.App_ihuyi(data["id"], phone, quhao, text)
 			if err != nil {
 				RET.Fail(c, 300, err.Error(), err.Error())
 			} else {
 				RET.Success(c, 0, err, str)
+			}
+			break
+
+		case "aliyun":
+			if !ProjectModel.Api_dec_amount(data["id"]) {
+				RET.Fail(c, 400, "没有数量了", "没有可以用于扣除的数量了")
+				return
+			}
+			err := action.App_aliyun(data["id"], phone, quhao, text)
+			if err != nil {
+				RET.Fail(c, 300, err, err.Error())
+			} else {
+				RET.Success(c, 0, err, nil)
 			}
 			break
 

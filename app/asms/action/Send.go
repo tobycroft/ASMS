@@ -2,8 +2,11 @@ package action
 
 import (
 	"errors"
+	"github.com/GiterLab/aliyun-sms-go-sdk/dysms"
 	config2 "github.com/sunnyos/tencentSms/config"
 	"github.com/sunnyos/tencentSms/sms"
+	"github.com/tobyzxj/uuid"
+	"main.go/app/asms/model/AliyunModel"
 	"main.go/app/asms/model/IhuyiModel"
 	"main.go/app/asms/model/LogErrorModel"
 	"main.go/app/asms/model/LogSuccessModel"
@@ -17,6 +20,14 @@ import (
 	"main.go/tuuz/Jsong"
 	"main.go/tuuz/Log"
 )
+
+func App_aliyun(id interface{}, phone, quhao, text string) error {
+	aliyun := AliyunModel.Api_find(id)
+	dysms.HTTPDebugEnable = true
+	dysms.SetACLClient(aliyun["acessid"].(string), aliyun["accesskey"].(string))
+	_, err := dysms.SendSms(uuid.New(), phone, aliyun["sign"].(string), aliyun["tpcode"].(string), text).DoActionWithException()
+	return err
+}
 
 func App_tencent(id interface{}, phone, quhao, text string) error {
 	tencent := TencentModel.Api_find(id)
