@@ -100,11 +100,11 @@ func send(c *gin.Context) {
 				RET.Fail(c, 400, "没有数量了", "没有可以用于扣除的数量了")
 				return
 			}
-			err := action.App_tencent(data["id"], phone, quhao, text)
+			ret, err := action.App_tencent(data["id"], phone, quhao, text)
 			if err != nil {
-				RET.Fail(c, 300, err, err.Error())
+				RET.Fail(c, 300, ret, err.Error())
 			} else {
-				RET.Success(c, 0, err, nil)
+				RET.Success(c, 0, ret, nil)
 			}
 			break
 

@@ -29,7 +29,7 @@ func App_aliyun(id interface{}, phone, quhao, text string) (interface{}, error) 
 	return ret, err
 }
 
-func App_tencent(id interface{}, phone, quhao, text string) error {
+func App_tencent(id interface{}, phone, quhao, text string) (interface{}, error) {
 	tencent := TencentModel.Api_find(id)
 	if len(tencent) > 0 {
 		config := &config2.Config{
@@ -41,21 +41,21 @@ func App_tencent(id interface{}, phone, quhao, text string) error {
 		res, err := s.GetSmsSender().Fetchs(phone, quhao, []string{text}, tencent["tplid"].(int64))
 		if err != nil {
 			Log.Crrs(err, tuuz.FUNCTION_ALL())
-			return err
+			return res, err
 		}
 		if res.Result == 0 {
 			if !ProjectModel.Api_dec_amount(tencent["pid"]) {
-				return errors.New("ProjectModelApi_dec_amount")
+				return nil, errors.New("ProjectModelApi_dec_amount")
 			}
 			LogSuccessModel.Api_insert(tencent["pid"], text)
-			return nil
+			return res, nil
 		} else {
 			LogErrorModel.Api_insert(tencent["pid"], res.Errmsg)
-			return errors.New(res.Errmsg)
+			return res, errors.New(res.Errmsg)
 		}
 		//fmt.Println(res.Errmsg, res.Ext, res.Result, err)
 	} else {
-		return errors.New("未找到项目")
+		return nil, errors.New("未找到项目")
 	}
 }
 
