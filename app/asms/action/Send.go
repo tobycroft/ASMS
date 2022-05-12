@@ -21,12 +21,12 @@ import (
 	"main.go/tuuz/Log"
 )
 
-func App_aliyun(id interface{}, phone, quhao, text string) error {
+func App_aliyun(id interface{}, phone, quhao, text string) (interface{}, error) {
 	aliyun := AliyunModel.Api_find(id)
 	dysms.HTTPDebugEnable = true
-	dysms.SetACLClient(aliyun["acessid"].(string), aliyun["accesskey"].(string))
-	_, err := dysms.SendSms(uuid.New(), phone, aliyun["sign"].(string), aliyun["tpcode"].(string), text).DoActionWithException()
-	return err
+	dysms.SetACLClient(aliyun["accessid"].(string), aliyun["accesskey"].(string))
+	ret, err := dysms.SendSms(uuid.New(), phone, aliyun["sign"].(string), aliyun["tpcode"].(string), text).DoActionWithException()
+	return ret, err
 }
 
 func App_tencent(id interface{}, phone, quhao, text string) error {
