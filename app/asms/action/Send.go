@@ -23,7 +23,7 @@ import (
 
 func App_aliyun(id interface{}, phone, quhao, text string) (interface{}, error) {
 	aliyun := AliyunModel.Api_find(id)
-	dysms.HTTPDebugEnable = true
+	dysms.HTTPDebugEnable = false
 	dysms.SetACLClient(aliyun["accessid"].(string), aliyun["accesskey"].(string))
 	ret, err := dysms.SendSms(uuid.New(), phone, aliyun["sign"].(string), aliyun["tpcode"].(string), text).DoActionWithException()
 	return ret, err
