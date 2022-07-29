@@ -6,26 +6,35 @@ import (
 	"main.go/config/app_conf"
 	"main.go/tuuz/Input"
 	"main.go/tuuz/RET"
+	"net/http"
 )
 
 func LoginedController() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("S-P-I", c.ClientIP())
-		c.Header("S-P-P", app_conf.Project)
-		c.Header("S-P-M", app_conf.AppMode)
-		uid, ok := Input.Post("uid", c, false)
-		if !ok {
-			c.Abort()
+		header_handler(c)
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
-		token, ok := Input.Post("token", c, false)
-		if !ok {
-			c.Abort()
-			return
+		uid := ""
+		token := ""
+		debug := ""
+		ok := false
+		if app_conf.HeaderAuthMode {
+			ok, uid, token, debug = header_auth(c)
+			if !ok {
+				c.Abort()
+				return
+			}
+		} else {
+			ok, uid, token, debug = post_auth(c)
+			if !ok {
+				c.Abort()
+				return
+			}
 		}
-		debug, ok := c.GetPostForm("debug")
-		if ok {
-			if debug == app_conf.Debug && app_conf.TestMode {
+		if app_conf.TestMode {
+			if debug == app_conf.Debug {
 				c.Next()
 				return
 			}
@@ -41,11 +50,24 @@ func LoginedController() gin.HandlerFunc {
 	}
 }
 
+func post_auth(c *gin.Context) (ok bool, uid string, token string, debug string) {
+	uid, ok = c.GetPostForm("uid")
+	if !ok {
+		c.JSON(RET.Ret_fail(-1, nil, "POST-[uid]"))
+		return
+	}
+	token, ok = c.GetPostForm("token")
+	if !ok {
+		c.JSON(RET.Ret_fail(-1, nil, "POST-[token]"))
+		return
+	}
+	debug = c.PostForm("debug")
+	return
+}
+
 func LoginWSController() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("S-P-I", c.ClientIP())
-		c.Header("S-P-P", app_conf.Project)
-		c.Header("S-P-M", app_conf.AppMode)
+		header_handler(c)
 		uid, ok := Input.Post("uid", c, false)
 		if !ok {
 			c.Abort()

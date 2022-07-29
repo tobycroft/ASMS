@@ -6,25 +6,155 @@ import (
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/shopspring/decimal"
-	"github.com/tobycroft/Calc"
 	"html/template"
 	"io"
 	"main.go/config/app_conf"
 	"main.go/tuuz/Array"
+	"main.go/tuuz/Calc"
 	"main.go/tuuz/Date"
+	"main.go/tuuz/Jsong"
 	"main.go/tuuz/RET"
 	"main.go/tuuz/Vali"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 )
 
-func Post(key string, c *gin.Context, xss bool) (string, bool) {
+func SPost(key string, c *gin.Context, DemoType interface{}) interface{} {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
+		return nil
+	} else {
+		switch DemoType.(type) {
+		case string:
+			return in
+
+		case int:
+			str, err := Calc.String2Int(in)
+			if err != nil {
+				return nil
+			}
+			return str
+
+		case int32:
+			str, err := Calc.String2Int64(in)
+			if err != nil {
+				return nil
+			}
+			return str
+
+		case int64:
+			str, err := Calc.String2Int64(in)
+			if err != nil {
+				return nil
+			}
+			return str
+
+		case float64:
+			str, err := Calc.String2Float64(in)
+			if err != nil {
+				return nil
+			}
+			return str
+
+		case float32:
+			str, err := Calc.String2Float64(in)
+			if err != nil {
+				return nil
+			}
+			return str
+
+		case decimal.Decimal:
+			ret, err := decimal.NewFromString(in)
+			if err != nil {
+				return nil
+			}
+			return ret
+
+		case nil:
+			return nil
+
+		case bool:
+			str, ok := SPostBool(key, c)
+			if !ok {
+				return nil
+			}
+			return str
+
+		}
+		return nil
+	}
+}
+
+func SPostDefault[T string | int | int32 | int64 | float32 | float64 | decimal.Decimal | any](key string, c *gin.Context, defaultValue T) T {
+	in, ok := c.GetPostForm(key)
+	if !ok {
+		return defaultValue
+	} else {
+		switch any(defaultValue).(type) {
+		case string:
+			return any(in).(T)
+
+		case int:
+			str, err := Calc.String2Int(in)
+			if err != nil {
+				return defaultValue
+			}
+			return any(str).(T)
+
+		case int32:
+			str, err := Calc.String2Int64(in)
+			if err != nil {
+				return defaultValue
+			}
+			return any(str).(T)
+
+		case int64:
+			str, err := Calc.String2Int64(in)
+			if err != nil {
+				return defaultValue
+			}
+			return any(str).(T)
+
+		case float64:
+			str, err := Calc.String2Float64(in)
+			if err != nil {
+				return defaultValue
+			}
+			return any(str).(T)
+
+		case float32:
+			str, err := Calc.String2Float64(in)
+			if err != nil {
+				return defaultValue
+			}
+			return any(str).(T)
+
+		case decimal.Decimal:
+			ret, err := decimal.NewFromString(in)
+			if err != nil {
+				return defaultValue
+			}
+			return any(ret).(T)
+
+		case nil:
+			return defaultValue
+
+		case bool:
+			str, ok := SPostBool(key, c)
+			if !ok {
+				return defaultValue
+			}
+			return any(str).(T)
+
+		}
+		return defaultValue
+	}
+}
+
+func SPostString(key string, c *gin.Context, xss bool) (string, bool) {
+	in, ok := c.GetPostForm(key)
+	if !ok {
 		return "", false
 	} else {
 		if xss {
@@ -35,43 +165,9 @@ func Post(key string, c *gin.Context, xss bool) (string, bool) {
 	}
 }
 
-func PostNull(key string, c *gin.Context, xss bool) (string, bool) {
+func SPostPhone(key string, length int, c *gin.Context) (string, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		return "", true
-	} else {
-		if xss {
-			return template.JSEscapeString(in), true
-		} else {
-			return in, true
-		}
-	}
-}
-
-func PostNullWithLength(key string, max_length int, c *gin.Context, xss bool) (string, bool) {
-	in, ok := c.GetPostForm(key)
-	if !ok {
-		return "", true
-	} else {
-		err := Vali.Length(in, 0, max_length)
-		if err != nil {
-			c.JSON(RET.Ret_fail(407, key+" "+err.Error(), key+" "+err.Error()))
-			c.Abort()
-			return "", false
-		}
-		if xss {
-			return template.JSEscapeString(in), true
-		} else {
-			return in, true
-		}
-	}
-}
-
-func PostPhone(key string, length int, c *gin.Context) (string, bool) {
-	in, ok := c.GetPostForm(key)
-	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return "", false
 	} else {
 		ret, err := decimal.NewFromString(in)
@@ -90,15 +186,13 @@ func PostPhone(key string, length int, c *gin.Context) (string, bool) {
 	}
 }
 
-func PostDate(key string, c *gin.Context) (time.Time, bool) {
-	return PostDateTime(key, c)
+func SPostDate(key string, c *gin.Context) (time.Time, bool) {
+	return SPostDateTime(key, c)
 }
 
-func PostDateTime(key string, c *gin.Context) (time.Time, bool) {
+func SPostDateTime(key string, c *gin.Context) (time.Time, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return time.Time{}, false
 	} else {
 		datetime, err := Date.Date_time_parser(in)
@@ -111,7 +205,7 @@ func PostDateTime(key string, c *gin.Context) (time.Time, bool) {
 	}
 }
 
-func PostTime(key string, c *gin.Context) (time.Time, bool) {
+func SPostTime(key string, c *gin.Context) (time.Time, bool) {
 	in, ok := PostInt64(key, c)
 	if !ok {
 		return time.Time{}, false
@@ -120,11 +214,9 @@ func PostTime(key string, c *gin.Context) (time.Time, bool) {
 	}
 }
 
-func PostLength(key string, min, max int, c *gin.Context, xss bool) (string, bool) {
+func SPostLength(key string, min, max int, c *gin.Context, xss bool) (string, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return "", false
 	} else {
 		err := Vali.Length(in, min, max)
@@ -141,11 +233,9 @@ func PostLength(key string, min, max int, c *gin.Context, xss bool) (string, boo
 	}
 }
 
-func PostInt(key string, c *gin.Context) (int, bool) {
+func SPostInt(key string, c *gin.Context) (int, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return 0, false
 	} else {
 		i, e := Calc.String2Int(in)
@@ -158,11 +248,9 @@ func PostInt(key string, c *gin.Context) (int, bool) {
 	}
 }
 
-func PostInt64(key string, c *gin.Context) (int64, bool) {
+func SPostInt64(key string, c *gin.Context) (int64, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return 0, false
 	} else {
 		i, e := Calc.String2Int64(in)
@@ -175,11 +263,9 @@ func PostInt64(key string, c *gin.Context) (int64, bool) {
 	}
 }
 
-func PostFloat64(key string, c *gin.Context) (float64, bool) {
+func SPostFloat64(key string, c *gin.Context) (float64, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return 0, false
 	} else {
 		i, e := Calc.String2Float64(in)
@@ -192,11 +278,9 @@ func PostFloat64(key string, c *gin.Context) (float64, bool) {
 	}
 }
 
-func PostDecimal(key string, c *gin.Context) (decimal.Decimal, bool) {
+func SPostDecimal(key string, c *gin.Context) (decimal.Decimal, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return decimal.Zero, false
 	} else {
 		ret, err := decimal.NewFromString(in)
@@ -209,11 +293,9 @@ func PostDecimal(key string, c *gin.Context) (decimal.Decimal, bool) {
 	}
 }
 
-func PostBool(key string, c *gin.Context) (bool, bool) {
+func SPostBool(key string, c *gin.Context) (bool, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return false, false
 	} else {
 		switch in {
@@ -237,70 +319,59 @@ func PostBool(key string, c *gin.Context) (bool, bool) {
 	}
 }
 
-func PostArray[T int | string | int64 | float64 | interface{}](key string, c *gin.Context) ([]T, bool) {
+func SPostArray[T string | int | int32 | int64 | float32 | float64 | any](key string, c *gin.Context) ([]T, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return nil, false
 	} else {
-		var arr []T
-		err := jsoniter.UnmarshalFromString(in, &arr)
+		i, err := Jsong.JArray[T](in)
 		if err != nil {
-			c.JSON(RET.Ret_fail(407, err.Error(), key+" should be a Json-Array now is : "+in))
+			c.JSON(RET.Ret_fail(407, err.Error(), key+" should be a Json-Array"))
 			c.Abort()
 			return nil, false
 		}
-		return arr, true
+		return i, true
 	}
 }
 
-func PostObject[T int | string | int64 | float64 | interface{}](key string, c *gin.Context) (map[string]T, bool) {
+func SPostObject[T string | int | int32 | int64 | float32 | float64, V string | int | int32 | int64 | float32 | float64 | any](key string, c *gin.Context) (map[T]V, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return nil, false
 	} else {
-		var arr map[string]T
-		err := jsoniter.UnmarshalFromString(in, &arr)
+		i, err := Jsong.JObject[T, V](in)
 		if err != nil {
-			c.JSON(RET.Ret_fail(407, err.Error(), key+" should be a Json-Object now is : "+in))
+			c.JSON(RET.Ret_fail(407, key+" should be a Json-Object", key+" should be a Json-Object"))
 			c.Abort()
 			return nil, false
 		}
-		return arr, true
+		return i, true
 	}
 }
 
-func PostArrayObject[T int | string | int64 | float64 | interface{}](key string, c *gin.Context) ([]map[string]T, bool) {
+func SPostArrayObject[T string | int | int32 | int64 | float32 | float64, V string | int | int32 | int64 | float32 | float64 | any](key string, c *gin.Context) ([]map[T]V, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return nil, false
 	} else {
-		var arr []map[string]T
-		err := jsoniter.UnmarshalFromString(in, &arr)
+		i, err := Jsong.JArrayObject[T, V](in)
 		if err != nil {
-			c.JSON(RET.Ret_fail(407, err.Error(), key+" should be a Json-ArrayObject now is : "+in))
+			c.JSON(RET.Ret_fail(407, key+" should be a Json-ArrayObject", key+" should be a Json-ArrayObject"))
 			c.Abort()
 			return nil, false
 		}
-		return arr, true
+		return i, true
 	}
 }
 
-func PostAny(key string, c *gin.Context, AnyType interface{}) bool {
+func SPostAny(key string, c *gin.Context, AnyType interface{}) bool {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return false
 	} else {
 		err := jsoniter.UnmarshalFromString(in, &AnyType)
 		if err != nil {
-			c.JSON(RET.Ret_fail(407, err.Error(), key+" should be a Json-AnyType now is : "+in))
+			c.JSON(RET.Ret_fail(407, err.Error(), key+" should be a Json-AnyType"))
 			c.Abort()
 			return false
 		}
@@ -308,23 +379,21 @@ func PostAny(key string, c *gin.Context, AnyType interface{}) bool {
 	}
 }
 
-func PostLimitPage(c *gin.Context) (int, int, error) {
-	limit, ok := PostInt("limit", c)
+func SPostLimitPage(c *gin.Context) (int, int, error) {
+	limit, ok := SPostInt("limit", c)
 	if !ok {
 		return 0, 0, errors.New("limit")
 	}
-	page, ok := PostInt("page", c)
+	page, ok := SPostInt("page", c)
 	if !ok {
 		return 0, 0, errors.New("page")
 	}
 	return limit, page, nil
 }
 
-func PostIn(key string, c *gin.Context, str_slices []string) (string, bool) {
+func SPostIn(key string, c *gin.Context, str_slices []string) (string, bool) {
 	in, ok := c.GetPostForm(key)
 	if !ok {
-		c.JSON(RET.Ret_fail(400, key, "POST-["+key+"]"))
-		c.Abort()
 		return "", false
 	} else {
 		if Array.InArray(in, str_slices) {
@@ -337,20 +406,9 @@ func PostIn(key string, c *gin.Context, str_slices []string) (string, bool) {
 	}
 }
 
-type File struct {
-	Path     string
-	FileName string
-	Size     int64
-	Md5      string
-	Mime     string
-	Ext      string
-}
-
-func Upload(c *gin.Context) (File, bool) {
+func SUpload(c *gin.Context) (File, bool) {
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(RET.Ret_fail(400, "File Upload Error", "POST-[file]:"+err.Error()))
-		c.Abort()
 		return File{}, false
 	}
 	temp_file, err := file.Open()
@@ -400,16 +458,4 @@ func Upload(c *gin.Context) (File, bool) {
 		Mime:     file.Header.Get("Content-Type"),
 		Ext:      ext,
 	}, true
-}
-
-func pathmake(path string) error {
-	_, err := os.Stat(path)
-	if err == nil {
-		return nil
-	}
-	if os.IsNotExist(err) {
-		err = os.MkdirAll(path, os.ModePerm)
-		return err
-	}
-	return err
 }

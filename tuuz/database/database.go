@@ -3,14 +3,29 @@ package database
 import (
 	"github.com/Unknwon/goconfig"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/gohouse/gorose/v2"
+	"github.com/tobycroft/gorose-pro"
 	"log"
+	"main.go/config/db_conf"
 )
 
 var Database *gorose.Engin
 
 func init() {
 	var err error
+	cfg, err := goconfig.LoadConfigFile("conf.ini")
+	if err != nil {
+		goconfig.SaveConfigFile(&goconfig.ConfigFile{}, "conf.ini")
+	} else {
+		_, err := cfg.GetSection("database")
+		if err != nil {
+			cfg.SetValue("database", "dbname", "")
+			cfg.SetValue("database", "dbuser", "")
+			cfg.SetValue("database", "dbpass", "")
+			cfg.SetValue("database", "dbhost", "")
+			cfg.SetValue("database", "dbport", "")
+			goconfig.SaveConfigFile(cfg, "conf.ini")
+		}
+	}
 	Database, err = gorose.Open(DbConfig())
 	if err != nil {
 		log.Panic(err)
@@ -30,30 +45,19 @@ func DbConfig() *gorose.Config {
 func dsn_local() string {
 	cfg, err := goconfig.LoadConfigFile("conf.ini")
 	if err != nil {
-		return dsn()
+		return db_conf.Dsn()
 	}
 	value, err := cfg.GetSection("database")
 	if err != nil {
-		return dsn()
+		return db_conf.Dsn()
 	} else {
 		dbname := value["dbname"]
 		dbuser := value["dbuser"]
 		dbpass := value["dbpass"]
 		dbhost := value["dbhost"]
+		dbport := value["dbport"]
 		conntype := "tcp"
-		dbport := "3306"
 		charset := "utf8mb4"
 		return dbuser + ":" + dbpass + "@" + conntype + "(" + dbhost + ":" + dbport + ")/" + dbname + "?charset=" + charset + "&parseTime=true"
 	}
-}
-
-func dsn() string {
-	dbname := "ASMS"
-	dbuser := "asms"
-	dbpass := "asms"
-	dbhost := "10.0.0.170"
-	conntype := "tcp"
-	dbport := "3306"
-	charset := "utf8mb4"
-	return dbuser + ":" + dbpass + "@" + conntype + "(" + dbhost + ":" + dbport + ")/" + dbname + "?charset=" + charset + "&parseTime=true"
 }

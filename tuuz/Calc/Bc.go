@@ -4,6 +4,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func ToDecimal(number interface{}) decimal.Decimal {
+	return todecimal(number)
+}
+
 func todecimal(number interface{}) decimal.Decimal {
 	switch number.(type) {
 	case int:
@@ -24,12 +28,15 @@ func todecimal(number interface{}) decimal.Decimal {
 	case string:
 		ret, err := decimal.NewFromString(number.(string))
 		if err != nil {
-			return decimal.NewFromInt(0)
+			return decimal.Zero
 		}
 		return ret
 
 	case decimal.Decimal:
 		return number.(decimal.Decimal)
+
+	case nil:
+		return decimal.Zero
 
 	default:
 		return decimal.NewFromFloat(Any2Float64(number))
@@ -70,6 +77,10 @@ func Bc_div_round(num1 interface{}, num2 interface{}, round int) decimal.Decimal
 
 func Bc_abs(num1 interface{}) decimal.Decimal {
 	return todecimal(num1).Abs()
+}
+
+func Bc_neg(num1 interface{}) decimal.Decimal {
+	return todecimal(num1).Abs().Neg()
 }
 
 func Bc_mod(num1, num2 interface{}) decimal.Decimal {

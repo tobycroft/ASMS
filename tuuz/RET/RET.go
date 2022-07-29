@@ -3,7 +3,9 @@ package RET
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"main.go/config/app_conf"
 	"main.go/tuuz/Jsong"
+	"net/http"
 )
 
 func Json(data interface{}) string {
@@ -19,12 +21,24 @@ func Success(c *gin.Context, code int, data, echo interface{}) {
 			echo = "成功"
 			break
 
+		case -1:
+			echo = "登录失效请重新登录"
+			break
+
 		case 400:
 			echo = "参数错误"
 			break
 
+		case 401:
+			echo = "鉴权失败"
+			break
+
 		case 403:
 			echo = "权限不足"
+			break
+
+		case 406, 407:
+			echo = "数据不符合期待"
 			break
 
 		case 404:
@@ -50,13 +64,26 @@ func Success(c *gin.Context, code int, data, echo interface{}) {
 	if data == nil {
 		data = []interface{}{}
 	}
-	c.JSON(Ret_succ(code, data, echo))
+	if app_conf.SecureJson {
+		retCode, retJson := Ret_succ(code, data, echo)
+		secure_json(c, &retCode, &retJson)
+	} else {
+		retCode, retJson := Ret_succ(code, data, echo)
+		json(c, &retCode, &retJson)
+	}
 	c.Abort()
 	return
 }
 
-func Fail(c *gin.Context, code int, data, echo interface{}) {
+func writeContentType(w http.ResponseWriter,
+	value []string) {
+	header := w.Header()
+	if val := header["Content-Type"]; len(val) == 0 {
+		header["Content-Type"] = value
+	}
+}
 
+func Fail(c *gin.Context, code int, data, echo interface{}) {
 	Success(c, code, data, echo)
 	return
 }
