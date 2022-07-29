@@ -33,7 +33,7 @@ func IndexController(route *gin.RouterGroup) {
 				c.Abort()
 				return
 			} else {
-				if app_conf.Debug {
+				if app_conf.TestMode {
 					token, ok := Input.Post("token", c, false)
 					if !ok {
 						return

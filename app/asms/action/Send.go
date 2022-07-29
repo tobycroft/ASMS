@@ -97,7 +97,7 @@ func App_ihuyi(id interface{}, phone, quhao, text string) (string, error) {
 		} else {
 			str, _ = ihuyi2.Ihuyi_send_intl(apiid, apikey, quhao, phone, text)
 		}
-		json, err := Jsong.JObject(str)
+		json, err := Jsong.JObject[string, any](str)
 		if err != nil {
 			LogErrorModel.Api_insert(ihuyi["pid"], str)
 			return str, err

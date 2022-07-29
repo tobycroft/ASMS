@@ -43,7 +43,7 @@ func Ihuyi_send(APIID, APIKEY, phone, content string) (string, error) {
 	resp, err := client.Do(req) //发送
 	defer resp.Body.Close()     //一定要关闭resp.Body
 	data, _ := ioutil.ReadAll(resp.Body)
-	jobject, err := Jsong.JObject(string(data))
+	jobject, err := Jsong.JObject[string, interface{}](string(data))
 	fmt.Println(jobject, err)
 
 	return string(data), err

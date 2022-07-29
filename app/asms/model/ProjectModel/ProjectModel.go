@@ -1,7 +1,7 @@
 package ProjectModel
 
 import (
-	"github.com/gohouse/gorose/v2"
+	"github.com/tobycroft/gorose-pro"
 	"main.go/tuuz"
 	"main.go/tuuz/Log"
 )
@@ -14,7 +14,7 @@ func Api_find(token interface{}) gorose.Data {
 		"token": token,
 	}
 	db.Where(where)
-	ret, err := db.First()
+	ret, err := db.Find()
 	if err != nil {
 		Log.Dbrr(err, tuuz.FUNCTION_ALL())
 		return nil

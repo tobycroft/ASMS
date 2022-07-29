@@ -1,7 +1,7 @@
 package TencentModel
 
 import (
-	"github.com/gohouse/gorose/v2"
+	"github.com/tobycroft/gorose-pro"
 	"main.go/tuuz"
 	"main.go/tuuz/Log"
 )
