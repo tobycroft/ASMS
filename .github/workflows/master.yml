@@ -1,0 +1,76 @@
+name: MasterBuild
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GOOS: linux
+      GOARCH: arm64
+      CGO_ENABLED: 0
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
+      - name: MasterBuild
+        run: go build -o asms_linux1
+
+      - name: SFTP Deploy w/ Password
+        # You may pin to the exact commit or the version.
+        # uses: LubricantJam/SFTP-Deploy-Action@c2ecced9e4b9c0094ad26bad07711ea12051ee21
+        uses: LubricantJam/SFTP-Deploy-Action@v2.1
+        with:
+          # Set this to your SFTP Username.
+          username: ${{ secrets.REMOTE_USER_MASTER }}
+          # Set this to your SFTP Server IP.
+          server: ${{ secrets.REMOTE_HOST_MASTER }}
+          # Set this to your SFTP Port, default is 22.
+          port: ${{ secrets.REMOTE_PORT_MASTER }}
+          # Set this to your SFTP Port.
+          ssh_password: ${{ secrets.REMOTE_PASSWORD_MASTER }}
+          # Set this to the path to transfer from.
+          local_path: asms_linux1
+          # Set this to the path to transfer to.
+          remote_path: /root/
+          # Set this to any optional SFTP arguments.
+          #          args: |
+          # Set this to any SSH commands you wish to run upon completion.
+          ssh_command: |
+          # Set this to true if you wish to upload an archive, default is false.
+          compress: false
+
+
+      - name: SSH remote command executer
+        # You may pin to the exact commit or the version.
+        # uses: tarunjangra/ssh-remote-cmd@514a9d52b1fb4cbf07d92049c771d331f005d9ba
+        uses: tarunjangra/ssh-remote-cmd@v1
+        with:
+          # Command to execute on the remote server.
+          command: |
+            killall asms_linux ;
+            rm -rf /root/asms_linux ;
+            cp /root/asms_linux1 /root/asms_linux ;
+            chmod +x /root/asms_linux ;
+            rm -rf /root/asms_linux1 ;
+            nohup /root/asms_linux > nohup.out 2> nohup.err < /dev/null&
+          # Hostname or IP address of the server.
+          host: ${{ secrets.REMOTE_HOST_MASTER }}
+          # Username for authentication.
+          user: ${{ secrets.REMOTE_USER_MASTER }}
+          # Port number of the server.
+          port: ${{ secrets.REMOTE_PORT_MASTER }}
+          # Password for authentication.
+          pass: ${{ secrets.REMOTE_PASSWORD_MASTER }}
+          # SSH parameters for example: -tt.
+
+
