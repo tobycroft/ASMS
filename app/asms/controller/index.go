@@ -3,6 +3,8 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"main.go/app/asms/action"
+	"main.go/app/asms/model/LogErrorModel"
+	"main.go/app/asms/model/LogSuccessModel"
 	"main.go/app/asms/model/ProjectModel"
 	"main.go/config/app_conf"
 	"main.go/tuuz/Calc"
@@ -141,8 +143,10 @@ func send(c *gin.Context) {
 			}
 			ret, err := action.App_aliyun(data["id"], phone, quhao, text)
 			if err != nil {
+				LogErrorModel.Api_insert(data["id"], err.Error())
 				RET.Fail(c, 300, ret, err.Error())
 			} else {
+				LogSuccessModel.Api_insert(data["id"], ret.Error())
 				RET.Success(c, 0, ret, nil)
 			}
 			break

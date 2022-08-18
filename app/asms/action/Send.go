@@ -21,7 +21,7 @@ import (
 	"main.go/tuuz/Log"
 )
 
-func App_aliyun(id interface{}, phone, quhao, text string) (interface{}, error) {
+func App_aliyun(id interface{}, phone, quhao, text string) (*dysms.SendSmsResponse, error) {
 	aliyun := AliyunModel.Api_find(id)
 	dysms.HTTPDebugEnable = false
 	dysms.SetACLClient(aliyun["accessid"].(string), aliyun["accesskey"].(string))
