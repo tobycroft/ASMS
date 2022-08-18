@@ -141,7 +141,7 @@ func send(c *gin.Context) {
 			}
 			ret, err := action.App_aliyun(data["id"], phone, quhao, text)
 			if err != nil {
-				RET.Fail(c, 300, err, err.Error())
+				RET.Fail(c, 300, ret, err.Error())
 			} else {
 				RET.Success(c, 0, ret, nil)
 			}
