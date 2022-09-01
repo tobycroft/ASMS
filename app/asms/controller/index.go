@@ -51,7 +51,6 @@ func IndexController(route *gin.RouterGroup) {
 						return
 					}
 				}
-
 				c.Next()
 				return
 			}
