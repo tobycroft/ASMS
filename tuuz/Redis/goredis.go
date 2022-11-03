@@ -15,24 +15,39 @@ var goredis_ctx context.Context
 var goredis *redis.Client
 
 func init() {
+	_ready()
+	_conn()
+	go _keepAlive()
+}
+
+func _ready() {
 	cfg, err := goconfig.LoadConfigFile("conf.ini")
 	if err != nil {
 		goconfig.SaveConfigFile(&goconfig.ConfigFile{}, "conf.ini")
+		_ready()
 	} else {
 		value, err := cfg.GetSection("redis")
 		if err != nil {
 			cfg.SetValue("redis", "address", "")
-			cfg.SetValue("redis", "port", "")
+			cfg.SetValue("redis", "port", app_conf.Redicon_port)
+			cfg.SetValue("redis", "username", app_conf.Redicon_username)
+			cfg.SetValue("redis", "password", app_conf.Redicon_password)
 			fmt.Println(goconfig.SaveConfigFile(cfg, "conf.ini"))
+			fmt.Println("redis_ready")
+			_ready()
 		} else {
-			if value["address"] != "" && value["port"] != "" {
-				app_conf.Redicon_address = value["address"]
-				app_conf.Redicon_port = value["port"]
+			app_conf.Redicon_address = value["address"]
+			app_conf.Redicon_port = value["port"]
+			app_conf.Redicon_username = value["username"]
+			app_conf.Redicon_password = value["password"]
+			if app_conf.Redicon_address != "" && app_conf.Redicon_port != "" {
 				app_conf.Redicon_on = true
 			}
 		}
 	}
+}
 
+func _conn() {
 	if !app_conf.Redicon_on {
 		return
 	}
@@ -52,8 +67,11 @@ func init() {
 		options.PoolSize = app_conf.Redicon_poolsize
 	}
 	goredis = redis.NewClient(&options)
-	goredis_ctx = goredis.Context()
-	go func() {
+	goredis_ctx = context.Background()
+}
+
+func _keepAlive() {
+	if app_conf.Redicon_on {
 		for {
 			time.Sleep(3 * time.Second)
 			ret, err := goredis.Ping(goredis_ctx).Result()
@@ -64,5 +82,5 @@ func init() {
 				}
 			}
 		}
-	}()
+	}
 }
